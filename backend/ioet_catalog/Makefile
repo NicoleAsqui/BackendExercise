@@ -52,8 +52,8 @@ win_create_dev_env:
 
 .PHONY: start
 start:  ## Starts the debug of the program
-	. .venv/bin/activate;
-	. .env
+	. .venv/bin/activate && \
+	. .env && \
 	uvicorn main:app --reload
 
 .PHONY: win_start
