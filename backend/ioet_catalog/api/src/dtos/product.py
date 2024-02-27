@@ -37,3 +37,6 @@ class EditProductRequestDto(BaseModel):
 class EditProductResponseDto(ProductBase):
     ...
 
+class DeleteProductResponseDto(BaseModel):
+    message: str
+

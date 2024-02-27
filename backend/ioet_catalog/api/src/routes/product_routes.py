@@ -1,6 +1,7 @@
 from typing import List
+from app.src.exceptions.business.product import ProductBusinessException
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.src.use_cases import (
     ListProducts, 
@@ -15,6 +16,9 @@ from app.src.use_cases import (
     FilterByStatusRequest,
     FilterByStatusResponse,
     EditProduct,
+    DeleteProduct,
+    DeleteProductRequest,
+
 )
 from ..dtos import (
     ProductBase,
@@ -23,7 +27,8 @@ from ..dtos import (
     CreateProductResponseDto,
     FindProductByIdResponseDto,
     EditProductResponseDto,
-    EditProductRequestDto
+    EditProductRequestDto,
+    DeleteProductResponseDto
 )
 from factories.use_cases import (
     list_product_use_case, 
@@ -31,7 +36,8 @@ from factories.use_cases import (
     create_product_use_case,
     create_product_use_case,
     filter_product_by_status_use_case,
-    edit_product_use_case
+    edit_product_use_case,
+    delete_product_use_case
 )
 from app.src.core.models import Product
 
@@ -117,3 +123,16 @@ async def edit_product(
             is_available=response.is_available
         )
         return response_dto
+
+@product_router.delete("/{product_id}", response_model=DeleteProductResponseDto)
+async def delete_product(
+    product_id: str,
+    use_case: DeleteProduct = Depends(delete_product_use_case)
+) -> DeleteProductResponseDto:
+    try:
+        response = use_case(DeleteProductRequest(product_id=product_id))
+        if not response:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return DeleteProductResponseDto(message="Product deleted successfully.")
+    except ProductBusinessException as e:
+        raise HTTPException(status_code=400, detail=str(e))

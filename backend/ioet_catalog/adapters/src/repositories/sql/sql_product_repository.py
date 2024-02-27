@@ -94,9 +94,22 @@ class SQLProductRepository(ProductRepository):
         self.session.rollback()
         raise ProductRepositoryException(method="edit")
 
-  def delete(self, product_id: str) -> Product:
-    # Needs Implementation
-    pass
+  def delete(self, product_id: str) -> None:
+    try:
+        with self.session as session:
+            product_to_delete = (
+                session.query(ProductSchema)
+                .filter(ProductSchema.product_id == product_id)
+                .first()
+            )
+            if product_to_delete:
+                session.delete(product_to_delete)
+                session.commit()
+            else:
+                raise ProductRepositoryException(method="delete", message="Product not found")
+    except Exception:
+        self.session.rollback()
+        raise ProductRepositoryException(method="delete")
 
   def filter_products_by_status(self, status: str) -> List[Product]:
     try:

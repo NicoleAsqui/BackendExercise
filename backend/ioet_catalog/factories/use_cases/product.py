@@ -1,6 +1,6 @@
 from app.src.repositories import ProductRepository
 from factories.repositories import sql_product_repository
-from app.src.use_cases import ListProducts, FindProductById, CreateProduct, FilterProductsByStatus, EditProduct
+from app.src.use_cases import ListProducts, FindProductById, CreateProduct, DeleteProduct, FilterProductsByStatus, EditProduct
 
 def get_product_repository() -> ProductRepository:
   return sql_product_repository()
@@ -19,3 +19,6 @@ def filter_product_by_status_use_case() -> FilterProductsByStatus:
 
 def edit_product_use_case() -> EditProduct:
   return EditProduct(get_product_repository())
+
+def delete_product_use_case() -> DeleteProduct:
+  return DeleteProduct(get_product_repository())
