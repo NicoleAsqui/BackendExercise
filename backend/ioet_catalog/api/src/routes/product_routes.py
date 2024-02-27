@@ -38,9 +38,14 @@ async def get_products(
     use_case: ListProducts = Depends(list_product_use_case)
 ) -> ListProductResponse:
     response = use_case()
-    response_dto: ListProductResponseDto = ListProductResponseDto(
-        products= [ProductBase(**product._asdict()) for product in response.products]
-    )
+    products = [
+        ProductBase(**{
+            **product._asdict(),
+            "status": product.status.value
+        }) 
+        for product in response.products
+    ]
+    response_dto: ListProductResponseDto = ListProductResponseDto(products=products)
     return response_dto
 
 @product_router.get("/{product_id}", response_model=FindProductByIdResponseDto)
