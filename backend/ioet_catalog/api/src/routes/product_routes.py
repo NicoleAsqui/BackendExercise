@@ -14,20 +14,24 @@ from app.src.use_cases import (
     FilterProductsByStatus,
     FilterByStatusRequest,
     FilterByStatusResponse,
+    EditProduct,
 )
 from ..dtos import (
     ProductBase,
     ListProductResponseDto, 
     CreateProductRequestDto,
     CreateProductResponseDto,
-    FindProductByIdResponseDto
+    FindProductByIdResponseDto,
+    EditProductResponseDto,
+    EditProductRequestDto
 )
 from factories.use_cases import (
     list_product_use_case, 
     find_product_by_id_use_case,
     create_product_use_case,
     create_product_use_case,
-    filter_product_by_status_use_case
+    filter_product_by_status_use_case,
+    edit_product_use_case
 )
 from app.src.core.models import Product
 
@@ -84,3 +88,32 @@ async def filter_products_by_status(
     request = FilterByStatusRequest(status=status)
     response = filter_use_case(request)
     return response
+
+@product_router.put("/{product_id}", response_model=EditProductResponseDto)
+async def edit_product(
+    product_id: str,
+    request: EditProductRequestDto,
+    use_case: EditProduct = Depends(edit_product_use_case)
+) -> EditProductResponseDto:
+    response = use_case(product_id, EditProductRequestDto(
+        user_id=request.user_id,         
+        name=request.name, 
+        description=request.description, 
+        price=request.price, 
+        location=request.location, 
+        status=request.status, 
+        is_available=request.is_available
+    ))
+
+    if response:
+        response_dto: EditProductResponseDto = EditProductResponseDto(
+            product_id=response.product_id,
+            user_id=response.user_id,
+            name=response.name,
+            description=response.description,
+            price=response.price,
+            location=response.location,
+            status=response.status.value,
+            is_available=response.is_available
+        )
+        return response_dto

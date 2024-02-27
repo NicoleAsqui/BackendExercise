@@ -75,8 +75,24 @@ class SQLProductRepository(ProductRepository):
       raise ProductRepositoryException(method="find")
 
   def edit(self, product: Product) -> Product:
-    # Needs Implementation
-    pass
+    try:
+        with self.session as session:
+            existing_product = session.query(ProductSchema).filter(ProductSchema.product_id == product.product_id).first()
+            if existing_product:
+                existing_product.user_id = product.user_id
+                existing_product.name = product.name
+                existing_product.description = product.description
+                existing_product.price = product.price
+                existing_product.location = product.location
+                existing_product.status = product.status
+                existing_product.is_available = product.is_available
+                session.commit()
+                return product
+            else:
+                raise ProductRepositoryException(method="edit")
+    except Exception:
+        self.session.rollback()
+        raise ProductRepositoryException(method="edit")
 
   def delete(self, product_id: str) -> Product:
     # Needs Implementation

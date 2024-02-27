@@ -12,7 +12,7 @@ class ProductBase(BaseModel):
     location: str
     status: str
     is_available: bool
-
+   
 class ListProductResponseDto(BaseModel):
     products: List[ProductBase]
 
@@ -24,3 +24,16 @@ class CreateProductRequestDto(ProductBase):
 
 class CreateProductResponseDto(ProductBase):
     ...
+    
+class EditProductRequestDto(BaseModel):
+    user_id: str
+    name: str
+    description:str | None
+    price: Decimal
+    location: str
+    status: str
+    is_available: bool
+    
+class EditProductResponseDto(ProductBase):
+    ...
+
